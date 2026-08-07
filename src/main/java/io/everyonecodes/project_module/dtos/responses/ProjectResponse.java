@@ -18,7 +18,5 @@ public class ProjectResponse {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-
-    // Derived value computed by the service layer to satisfy your proposal
     private Integer productCount;
 }
