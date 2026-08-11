@@ -10,4 +10,6 @@ import java.util.List;
 public interface ProjectProductRepository extends JpaRepository<ProjectProduct, Long> {
     // Find all products of a project
     List<ProjectProduct> findByProjectId(Long projectId);
+
+    long countByProjectId(Long projectId);
 }
