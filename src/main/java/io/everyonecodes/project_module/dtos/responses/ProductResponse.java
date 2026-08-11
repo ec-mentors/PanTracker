@@ -15,12 +15,7 @@ public class ProductResponse {
 
     private Long id;
 
-    // user context
-    private Long userId;
-    private String username;
-
     // Category context
-    private Long categoryId;
     private String categoryName;
 
     // Product Details

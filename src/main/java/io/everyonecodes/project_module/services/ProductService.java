@@ -36,7 +36,6 @@ public class ProductService {
 
         // map DTO to Product model
         Product product = Product.builder()
-                .user(user)
                 .category(category)
                 .name(request.getName())
                 .brand(request.getBrand())
@@ -120,9 +119,6 @@ public class ProductService {
     private ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
-                .userId(product.getUser().getId())
-                .username(product.getUser().getUsername())
-                .categoryId(product.getCategory().getId())
                 .categoryName(product.getCategory().getName())
                 .name(product.getName())
                 .brand(product.getBrand())

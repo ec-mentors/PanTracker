@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ProjectResponse {
     private Long id;
-    private Long userId;
     private String name;
     private String description;
     private LocalDate startDate;
