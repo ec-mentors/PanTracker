@@ -1,6 +1,8 @@
 package io.everyonecodes.project_module.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -47,6 +49,8 @@ public class Product {
     @Column(name = "current_weight_grams", precision = 5, scale = 2)
     private BigDecimal currentWeightGrams;
 
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 10, message = "Rating cannot exceed 10")
     private Integer rating;
 
     @Column(name = "is_finished", nullable = false)

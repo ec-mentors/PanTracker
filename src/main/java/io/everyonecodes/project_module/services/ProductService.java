@@ -45,6 +45,7 @@ public class ProductService {
                 .periodAfterOpeningMonths(request.getPeriodAfterOpeningMonths())
                 .startingWeightGrams(request.getStartingWeightGrams())
                 .currentWeightGrams(request.getStartingWeightGrams())
+                .rating(request.getRating())
                 .isFinished(false)
                 .build();
 
@@ -100,6 +101,7 @@ public class ProductService {
         product.setOpeningDate(request.getOpeningDate());
         product.setPeriodAfterOpeningMonths(request.getPeriodAfterOpeningMonths());
         product.setStartingWeightGrams(request.getStartingWeightGrams());
+        product.setRating(request.getRating());
 
         // save and return response DTO
         Product updatedProduct = productRepository.save(product);

@@ -1,8 +1,6 @@
 package io.everyonecodes.project_module.dtos.requests;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,4 +32,8 @@ public class ProductRequest {
 
     private BigDecimal startingWeightGrams;
     private LocalDate purchaseDate;
+
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 10, message = "Rating cannot exceed 10")
+    private Integer rating;
 }
