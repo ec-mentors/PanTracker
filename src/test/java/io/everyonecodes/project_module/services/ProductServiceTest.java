@@ -162,7 +162,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateProduct_SuccessNoCategoryChange() {
+    void updateProductSuccessNoCategoryChange() {
         Long productId = 10L;
         Long categoryId = 5L;
         Category category = Category.builder().id(categoryId).name("Lipstick").build();
