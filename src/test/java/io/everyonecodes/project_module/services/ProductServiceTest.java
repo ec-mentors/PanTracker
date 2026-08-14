@@ -17,10 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -40,7 +41,7 @@ class ProductServiceTest {
     private ProductService productService;
 
     @Test
-    void createProduct_Success() {
+    void createProductSuccess() {
         // inputs and mock behaviors
         Long userId = 1L;
         Long categoryId = 5L;
@@ -89,7 +90,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void createProduct_ThrowsException_WhenUserNotFound() {
+    void createProductThrowsExceptionWhenUserNotFound() {
         Long userId = 67L;
         ProductRequest request = ProductRequest.builder().categoryId(1L).build();
 
@@ -100,5 +101,187 @@ class ProductServiceTest {
                 .hasMessageContaining("User with ID 67 not found");
 
         verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void getActiveCollectionSuccess() {
+        Long userId = 1L;
+        User user = User.builder().id(userId).username("Jakob").build();
+        Category category = Category.builder().id(5L).name("Lipstick").build();
+
+        Product activeProduct = Product.builder()
+                .id(1L)
+                .user(user)
+                .category(category)
+                .name("Nude Brown Honey")
+                .brand("MAC")
+                .isFinished(false)
+                .build();
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(productRepository.findByUserIdAndIsFinished(userId, false))
+                .thenReturn(java.util.List.of(activeProduct));
+
+        List<ProductResponse> responseList = productService.getActiveCollection(userId);
+
+        assertThat(responseList).isNotEmpty().hasSize(1);
+        ProductResponse response = responseList.getFirst();
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getCategoryName()).isEqualTo("Lipstick");
+        assertThat(response.isFinished()).isFalse();
+
+        verify(productRepository, times(1)).findByUserIdAndIsFinished(userId, false);
+    }
+
+    @Test
+    void getEmptiesCollectionSuccess() {
+        Long userId = 2L;
+        User user = User.builder().id(userId).username("Jakob").build();
+        Category category = Category.builder().id(5L).name("Lipstick").build();
+
+        Product finishedProduct = Product.builder()
+                .id(2L)
+                .user(user)
+                .category(category)
+                .name("Finished Lipstick")
+                .isFinished(true)
+                .build();
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(productRepository.findByUserIdAndIsFinished(userId, true))
+                .thenReturn(java.util.List.of(finishedProduct));
+
+        java.util.List<ProductResponse> responseList = productService.getEmptiesCollection(userId);
+
+        assertThat(responseList).isNotEmpty().hasSize(1);
+        ProductResponse response = responseList.getFirst();
+        assertThat(response.getId()).isEqualTo(2L);
+        assertThat(response.isFinished()).isTrue();
+
+        verify(productRepository, times(1)).findByUserIdAndIsFinished(userId, true);
+    }
+
+    @Test
+    void updateProduct_SuccessNoCategoryChange() {
+        Long productId = 10L;
+        Long categoryId = 5L;
+        Category category = Category.builder().id(categoryId).name("Lipstick").build();
+        User user = User.builder().id(1L).username("Jakob").build();
+
+        ProductRequest request = ProductRequest.builder()
+                .name("Updated Name")
+                .brand("Updated Brand")
+                .categoryId(categoryId) // Same category ID
+                .openingDate(LocalDate.now())
+                .periodAfterOpeningMonths(24)
+                .startingWeightGrams(BigDecimal.valueOf(12.2))
+                .rating(9)
+                .build();
+
+        Product existingProduct = Product.builder()
+                .id(productId)
+                .user(user)
+                .category(category)
+                .name("Old Name")
+                .brand("Old Brand")
+                .build();
+
+        Product updatedProduct = Product.builder()
+                .id(productId)
+                .user(user)
+                .category(category)
+                .name(request.getName())
+                .brand(request.getBrand())
+                .openingDate(request.getOpeningDate())
+                .periodAfterOpeningMonths(request.getPeriodAfterOpeningMonths())
+                .startingWeightGrams(request.getStartingWeightGrams())
+                .rating(request.getRating())
+                .build();
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.save(any(Product.class))).thenReturn(updatedProduct);
+
+        ProductResponse response = productService.updateProduct(productId, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(productId);
+        assertThat(response.getName()).isEqualTo("Updated Name");
+        assertThat(response.getBrand()).isEqualTo("Updated Brand");
+        assertThat(response.getRating()).isEqualTo(9);
+
+        // verify we never queried categoryRepository because the category ID did not change
+        verify(categoryRepository, never()).findById(anyLong());
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    void updateProductSuccessWithCategoryChange() {
+        Long productId = 10L;
+        Long oldCategoryId = 5L;
+        Long newCategoryId = 6L;
+
+        Category oldCategory = Category.builder().id(oldCategoryId).name("Lipstick").build();
+        Category newCategory = Category.builder().id(newCategoryId).name("Lip Gloss").build();
+        User user = User.builder().id(1L).username("Jakob").build();
+
+        ProductRequest request = ProductRequest.builder()
+                .name("Lip Gloss Product")
+                .categoryId(newCategoryId) // Changed category ID
+                .openingDate(LocalDate.now())
+                .periodAfterOpeningMonths(12)
+                .build();
+
+        Product existingProduct = Product.builder()
+                .id(productId)
+                .user(user)
+                .category(oldCategory)
+                .name("Old Name")
+                .build();
+
+        Product updatedProduct = Product.builder()
+                .id(productId)
+                .user(user)
+                .category(newCategory)
+                .name(request.getName())
+                .openingDate(request.getOpeningDate())
+                .periodAfterOpeningMonths(request.getPeriodAfterOpeningMonths())
+                .build();
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(categoryRepository.findById(newCategoryId)).thenReturn(Optional.of(newCategory));
+        when(productRepository.save(any(Product.class))).thenReturn(updatedProduct);
+
+        ProductResponse response = productService.updateProduct(productId, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getCategoryName()).isEqualTo("Lip Gloss");
+
+        // verify we did query the category repository because the ID changed
+        verify(categoryRepository, times(1)).findById(newCategoryId);
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    void deleteProductSuccess() {
+        Long productId = 10L;
+        Product product = Product.builder().id(productId).name("Item to Delete").build();
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+        productService.deleteProduct(productId);
+
+        verify(productRepository, times(1)).delete(product);
+    }
+
+    @Test
+    void deleteProductThrowsExceptionWhenProductNotFound() {
+        Long productId = 67L;
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.deleteProduct(productId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Product with ID 67 not found");
+
+        verify(productRepository, never()).delete(any(Product.class));
     }
 }
