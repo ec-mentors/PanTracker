@@ -1,7 +1,95 @@
 package io.everyonecodes.project_module.services;
 
+import io.everyonecodes.project_module.dtos.requests.ProjectProductLinkRequest;
+import io.everyonecodes.project_module.dtos.responses.ProjectProductResponse;
+import io.everyonecodes.project_module.exceptions.ResourceNotFoundException;
+import io.everyonecodes.project_module.models.Product;
+import io.everyonecodes.project_module.models.Project;
+import io.everyonecodes.project_module.models.ProjectProduct;
+import io.everyonecodes.project_module.models.ProjectProductId;
+import io.everyonecodes.project_module.repositories.ProductRepository;
+import io.everyonecodes.project_module.repositories.ProjectProductRepository;
+import io.everyonecodes.project_module.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
+@RequiredArgsConstructor
 public class ProjectProductService {
+    private final ProjectProductRepository projectProductRepository;
+    private final ProjectRepository projectRepository;
+    private final ProductRepository productRepository;
+
+    // link product to project and set goals for usage
+    @Transactional
+    public ProjectProductResponse addProductToProject(Long projectId, Long productId, ProjectProductLinkRequest request) {
+        // check if project and product exist
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + productId + " not found."));
+
+        ProjectProductId id = new ProjectProductId(projectId, productId);
+
+        if (projectProductRepository.existsById(id)) {
+            throw new IllegalArgumentException("Product is already linked to this project.");
+        }
+
+        ProjectProduct projectProduct = ProjectProduct.builder()
+                .id(id)
+                .project(project)
+                .product(product)
+                .goalType(request.getGoalType())
+                .targetUses(request.getTargetUses())
+                .currentUses(0) // Newly added products start at 0 uses
+                .build();
+
+        ProjectProduct saved = projectProductRepository.save(projectProduct);
+        return mapToResponse(saved);
+    }
+
+    @Transactional
+    public void removeProductFromProject(Long projectId, Long productId) {
+        ProjectProductId id = new ProjectProductId(projectId, productId);
+
+        ProjectProduct projectProduct = projectProductRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Link between Project " + projectId + " and Product " + productId + " not found."));
+
+        projectProductRepository.delete(projectProduct);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectProductResponse> getProductsInProject(Long projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new ResourceNotFoundException("Project with ID " + projectId + " not found.");
+        }
+
+        return projectProductRepository.findByProjectId(projectId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private ProjectProductResponse mapToResponse(ProjectProduct junction) {
+        return ProjectProductResponse.builder()
+                .projectId(junction.getProject().getId())
+                .projectName(junction.getProject().getName())
+                .productId(junction.getProduct().getId())
+                .productName(junction.getProduct().getName())
+                .productBrand(junction.getProduct().getBrand())
+                .categoryName(junction.getProduct().getCategory().getName())
+                .currentWeightGrams(junction.getProduct().getCurrentWeightGrams())
+                .isFinished(junction.getProduct().isFinished())
+                .goalType(junction.getGoalType())
+                .targetUses(junction.getTargetUses())
+                .currentUses(junction.getCurrentUses())
+                .build();
+    }
 }
