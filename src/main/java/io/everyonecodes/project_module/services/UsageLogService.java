@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,9 +46,10 @@ public class UsageLogService {
 
             ProjectProductId junctionId = new ProjectProductId(request.getProjectId(), productId);
 
-            projectProduct = projectProductRepository.findById(junctionId)
-                    .orElseThrow(() -> new IllegalArgumentException("Product with ID " + productId +
-                            " is not participating in Project with ID " + request.getProjectId()));
+            if (!projectProductRepository.existsById(junctionId)) {
+                throw new IllegalArgumentException("Product with ID " + productId +
+                        " is not participating in Project with ID " + request.getProjectId());
+            }
         }
 
         // check if weight is correct
