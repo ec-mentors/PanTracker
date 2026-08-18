@@ -36,4 +36,6 @@ public class ProductRequest {
     @Min(value = 1, message = "Rating must be at least 1")
     @Max(value = 10, message = "Rating cannot exceed 10")
     private Integer rating;
+
+    private boolean isFinished;
 }

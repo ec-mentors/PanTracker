@@ -47,7 +47,7 @@ public class ProjectProductService {
                 .product(product)
                 .goalType(request.getGoalType())
                 .targetUses(request.getTargetUses())
-                .currentUses(0) // Newly added products start at 0 uses
+                .currentUses(0)
                 .build();
 
         ProjectProduct saved = projectProductRepository.save(projectProduct);

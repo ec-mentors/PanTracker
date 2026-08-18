@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,6 +102,14 @@ public class ProductService {
         product.setPeriodAfterOpeningMonths(request.getPeriodAfterOpeningMonths());
         product.setStartingWeightGrams(request.getStartingWeightGrams());
         product.setRating(request.getRating());
+
+        if (request.getIsFinished() != null) {
+            product.setFinished(request.getIsFinished());
+
+            if (request.getIsFinished()) {
+                product.setCurrentWeightGrams(BigDecimal.ZERO);
+            }
+        }
 
         // save and return response DTO
         Product updatedProduct = productRepository.save(product);

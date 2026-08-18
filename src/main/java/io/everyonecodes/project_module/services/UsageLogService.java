@@ -51,11 +51,6 @@ public class UsageLogService {
                             " is not participating in Project with ID " + request.getProjectId()));
 
             projectProduct.setCurrentUses(projectProduct.getCurrentUses() + 1);
-
-            if ("USE_X_TIMES".equals(projectProduct.getGoalType()) &&
-                    projectProduct.getCurrentUses().equals(projectProduct.getTargetUses())) {
-                product.setFinished(true);
-            }
         }
 
         // check if weight is correct
@@ -73,7 +68,7 @@ public class UsageLogService {
             }
         }
 
-        // save Usagelog
+        // save Usage log
         UsageLog log = UsageLog.builder()
                 .product(product)
                 .project(project)
@@ -117,10 +112,10 @@ public class UsageLogService {
         // if this log was associated with a project, reduce the usage count
         if (log.getProject() != null) {
             ProjectProductId junctionId = new ProjectProductId(log.getProject().getId(), product.getId());
-            Optional<ProjectProduct> projectProductOpt = projectProductRepository.findById(junctionId);
+            Optional<ProjectProduct> projectProductOption = projectProductRepository.findById(junctionId);
 
-            if (projectProductOpt.isPresent()) {
-                ProjectProduct projectProduct = projectProductOpt.get();
+            if (projectProductOption.isPresent()) {
+                ProjectProduct projectProduct = projectProductOption.get();
                 if (projectProduct.getCurrentUses() > 0) {
                     projectProduct.setCurrentUses(projectProduct.getCurrentUses() - 1);
 
