@@ -8,6 +8,7 @@ import io.everyonecodes.project_module.models.Product;
 import io.everyonecodes.project_module.models.User;
 import io.everyonecodes.project_module.repositories.CategoryRepository;
 import io.everyonecodes.project_module.repositories.ProductRepository;
+import io.everyonecodes.project_module.repositories.UsageLogRepository;
 import io.everyonecodes.project_module.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final UsageLogRepository usageLogRepository;
 
     //creating a new product
     @Transactional
@@ -126,6 +128,8 @@ public class ProductService {
     }
 
     private ProductResponse mapToResponse(Product product) {
+        int totalUses = usageLogRepository.countByProductId(product.getId());
+
         return ProductResponse.builder()
                 .id(product.getId())
                 .categoryName(product.getCategory().getName())
@@ -138,6 +142,7 @@ public class ProductService {
                 .currentWeightGrams(product.getCurrentWeightGrams())
                 .rating(product.getRating())
                 .isFinished(product.isFinished())
+                .totalUses(totalUses)
                 .build();
     }
 }

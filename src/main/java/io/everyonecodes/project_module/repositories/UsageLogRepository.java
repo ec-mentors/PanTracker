@@ -13,4 +13,7 @@ public interface UsageLogRepository extends JpaRepository<UsageLog, Long> {
 
     // usage logs of a project,  newest to oldest
     List<UsageLog> findByProjectIdOrderByUseDateDesc(Long projectId);
+
+    int countByProductId(Long productId);
+    int countByProductIdAndProjectId(Long productId, Long projectId);
 }

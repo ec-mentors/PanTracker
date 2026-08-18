@@ -10,6 +10,7 @@ import io.everyonecodes.project_module.models.ProjectProductId;
 import io.everyonecodes.project_module.repositories.ProductRepository;
 import io.everyonecodes.project_module.repositories.ProjectProductRepository;
 import io.everyonecodes.project_module.repositories.ProjectRepository;
+import io.everyonecodes.project_module.repositories.UsageLogRepository;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ProjectProductService {
     private final ProjectProductRepository projectProductRepository;
     private final ProjectRepository projectRepository;
     private final ProductRepository productRepository;
+    private final UsageLogRepository usageLogRepository;
 
     // link product to project and set goals for usage
     @Transactional
@@ -47,7 +49,6 @@ public class ProjectProductService {
                 .product(product)
                 .goalType(request.getGoalType())
                 .targetUses(request.getTargetUses())
-                .currentUses(0)
                 .build();
 
         ProjectProduct saved = projectProductRepository.save(projectProduct);
@@ -78,6 +79,10 @@ public class ProjectProductService {
     }
 
     private ProjectProductResponse mapToResponse(ProjectProduct junction) {
+        Long productId = junction.getProduct().getId();
+        Long projectId = junction.getProject().getId();
+        int currentUses = usageLogRepository.countByProductIdAndProjectId(productId, projectId);
+
         return ProjectProductResponse.builder()
                 .projectId(junction.getProject().getId())
                 .projectName(junction.getProject().getName())
@@ -89,7 +94,7 @@ public class ProjectProductService {
                 .isFinished(junction.getProduct().isFinished())
                 .goalType(junction.getGoalType())
                 .targetUses(junction.getTargetUses())
-                .currentUses(junction.getCurrentUses())
+                .currentUses(currentUses)
                 .build();
     }
 }

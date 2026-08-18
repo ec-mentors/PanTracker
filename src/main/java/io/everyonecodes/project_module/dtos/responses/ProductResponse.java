@@ -28,4 +28,5 @@ public class ProductResponse {
     private BigDecimal currentWeightGrams;
     private Integer rating;
     private boolean isFinished;
+    private Integer totalUses;
 }

@@ -46,11 +46,10 @@ public class UsageLogService {
                     .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + request.getProjectId() + " not found."));
 
             ProjectProductId junctionId = new ProjectProductId(request.getProjectId(), productId);
+
             projectProduct = projectProductRepository.findById(junctionId)
                     .orElseThrow(() -> new IllegalArgumentException("Product with ID " + productId +
                             " is not participating in Project with ID " + request.getProjectId()));
-
-            projectProduct.setCurrentUses(projectProduct.getCurrentUses() + 1);
         }
 
         // check if weight is correct
@@ -79,11 +78,7 @@ public class UsageLogService {
 
         UsageLog savedLog = usageLogRepository.save(log);
 
-        // update entities
         productRepository.save(product);
-        if (projectProduct != null) {
-            projectProductRepository.save(projectProduct);
-        }
 
         return mapToResponse(savedLog);
     }
@@ -108,27 +103,6 @@ public class UsageLogService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usage log with ID " + logId + " not found."));
 
         Product product = log.getProduct();
-
-        // if this log was associated with a project, reduce the usage count
-        if (log.getProject() != null) {
-            ProjectProductId junctionId = new ProjectProductId(log.getProject().getId(), product.getId());
-            Optional<ProjectProduct> projectProductOption = projectProductRepository.findById(junctionId);
-
-            if (projectProductOption.isPresent()) {
-                ProjectProduct projectProduct = projectProductOption.get();
-                if (projectProduct.getCurrentUses() > 0) {
-                    projectProduct.setCurrentUses(projectProduct.getCurrentUses() - 1);
-
-                    // revert finished status if needed
-                    if ("USE_X_TIMES".equals(projectProduct.getGoalType()) &&
-                            projectProduct.getCurrentUses() < projectProduct.getTargetUses()) {
-                        product.setFinished(false);
-                    }
-                    projectProductRepository.save(projectProduct);
-                    productRepository.save(product);
-                }
-            }
-        }
 
         usageLogRepository.delete(log);
     }
