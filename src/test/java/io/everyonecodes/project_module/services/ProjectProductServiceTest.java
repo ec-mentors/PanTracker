@@ -7,6 +7,7 @@ import io.everyonecodes.project_module.models.*;
 import io.everyonecodes.project_module.repositories.ProductRepository;
 import io.everyonecodes.project_module.repositories.ProjectProductRepository;
 import io.everyonecodes.project_module.repositories.ProjectRepository;
+import io.everyonecodes.project_module.repositories.UsageLogRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +34,9 @@ class ProjectProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private UsageLogRepository usageLogRepository;
+
     @InjectMocks
     private ProjectProductService projectProductService;
 
@@ -58,13 +62,13 @@ class ProjectProductServiceTest {
                 .product(product)
                 .goalType("HIT_PAN")
                 .targetUses(30)
-                .currentUses(0)
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(projectProductRepository.existsById(compositeId)).thenReturn(false);
         when(projectProductRepository.save(any(ProjectProduct.class))).thenReturn(savedJunction);
+        when(usageLogRepository.countByProductIdAndProjectId(productId, projectId)).thenReturn(0);
 
         ProjectProductResponse response = projectProductService.addProductToProject(projectId, productId, request);
 
@@ -72,7 +76,6 @@ class ProjectProductServiceTest {
         assertThat(response.getProjectId()).isEqualTo(projectId);
         assertThat(response.getProductId()).isEqualTo(productId);
         assertThat(response.getGoalType()).isEqualTo("HIT_PAN");
-        assertThat(response.getCurrentUses()).isEqualTo(0);
 
         verify(projectProductRepository, times(1)).save(any(ProjectProduct.class));
     }
@@ -174,11 +177,11 @@ class ProjectProductServiceTest {
                 .product(product)
                 .goalType("HIT_PAN")
                 .targetUses(20)
-                .currentUses(5)
                 .build();
 
         when(projectRepository.existsById(projectId)).thenReturn(true);
         when(projectProductRepository.findByProjectId(projectId)).thenReturn(List.of(link));
+        when(usageLogRepository.countByProductIdAndProjectId(10L, projectId)).thenReturn(5);
 
         List<ProjectProductResponse> responseList = projectProductService.getProductsInProject(projectId);
 
@@ -187,7 +190,6 @@ class ProjectProductServiceTest {
         assertThat(response.getProjectId()).isEqualTo(projectId);
         assertThat(response.getProductId()).isEqualTo(10L);
         assertThat(response.getCategoryName()).isEqualTo("Mascara");
-        assertThat(response.getCurrentUses()).isEqualTo(5);
     }
 
     @Test

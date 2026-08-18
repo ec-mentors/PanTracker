@@ -8,6 +8,7 @@ import io.everyonecodes.project_module.models.Product;
 import io.everyonecodes.project_module.models.User;
 import io.everyonecodes.project_module.repositories.CategoryRepository;
 import io.everyonecodes.project_module.repositories.ProductRepository;
+import io.everyonecodes.project_module.repositories.UsageLogRepository;
 import io.everyonecodes.project_module.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +37,9 @@ class ProductServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private UsageLogRepository usageLogRepository;
 
     @InjectMocks
     private ProductService productService;
@@ -75,6 +79,7 @@ class ProductServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
+        when(usageLogRepository.countByProductId(anyLong())).thenReturn(0);
 
         ProductResponse response = productService.createProduct(userId, request);
 
@@ -121,6 +126,7 @@ class ProductServiceTest {
         when(userRepository.existsById(userId)).thenReturn(true);
         when(productRepository.findByUserIdAndIsFinished(userId, false))
                 .thenReturn(java.util.List.of(activeProduct));
+        when(usageLogRepository.countByProductId(anyLong())).thenReturn(0);
 
         List<ProductResponse> responseList = productService.getActiveCollection(userId);
 
@@ -150,6 +156,7 @@ class ProductServiceTest {
         when(userRepository.existsById(userId)).thenReturn(true);
         when(productRepository.findByUserIdAndIsFinished(userId, true))
                 .thenReturn(java.util.List.of(finishedProduct));
+        when(usageLogRepository.countByProductId(anyLong())).thenReturn(0);
 
         java.util.List<ProductResponse> responseList = productService.getEmptiesCollection(userId);
 
@@ -200,6 +207,7 @@ class ProductServiceTest {
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
         when(productRepository.save(any(Product.class))).thenReturn(updatedProduct);
+        when(usageLogRepository.countByProductId(anyLong())).thenReturn(0);
 
         ProductResponse response = productService.updateProduct(productId, request);
 
@@ -250,6 +258,7 @@ class ProductServiceTest {
         when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
         when(categoryRepository.findById(newCategoryId)).thenReturn(Optional.of(newCategory));
         when(productRepository.save(any(Product.class))).thenReturn(updatedProduct);
+        when(usageLogRepository.countByProductId(anyLong())).thenReturn(0);
 
         ProductResponse response = productService.updateProduct(productId, request);
 
