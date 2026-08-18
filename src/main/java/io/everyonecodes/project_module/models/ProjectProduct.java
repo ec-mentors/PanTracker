@@ -31,8 +31,4 @@ public class ProjectProduct {
 
     @Column(name = "target_uses")
     private Integer targetUses;
-
-    @Column(name = "current_uses", nullable = false)
-    @Builder.Default
-    private Integer currentUses = 0;
 }

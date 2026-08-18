@@ -68,7 +68,6 @@ CREATE TABLE project_products (
 
       goal_type VARCHAR(30) NOT NULL DEFAULT 'FINISH_COMPLETELY',
       target_uses INTEGER CHECK (target_uses > 0),
-      current_uses INTEGER NOT NULL DEFAULT 0,
 
       PRIMARY KEY (project_id, product_id),
 
