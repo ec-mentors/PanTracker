@@ -1,10 +1,7 @@
 package io.everyonecodes.project_module.dtos.requests;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,5 +34,5 @@ public class ProductRequest {
     @Max(value = 10, message = "Rating cannot exceed 10")
     private Integer rating;
 
-    private boolean isFinished;
+    private Boolean isFinished;
 }
