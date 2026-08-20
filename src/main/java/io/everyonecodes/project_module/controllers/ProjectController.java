@@ -18,21 +18,21 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping("/user/{userId}/projects")
-    private ResponseEntity<ProjectResponse> createProject (@PathVariable Long userId, @Valid @RequestBody ProjectRequest request) {
+    public ResponseEntity<ProjectResponse> createProject (@PathVariable Long userId, @Valid @RequestBody ProjectRequest request) {
         ProjectResponse response = projectService.createProject(userId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/user/{userId}/projects")
-    private ResponseEntity<List<ProjectResponse>> getProjectsByUser (@PathVariable Long userId) {
+    public ResponseEntity<List<ProjectResponse>> getProjectsByUser (@PathVariable Long userId) {
         List<ProjectResponse> responses = projectService.getProjectsByUser(userId);
 
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/projects/{projectId}")
-    private ResponseEntity<ProjectResponse> getProjectById (@PathVariable Long projectId) {
+    public ResponseEntity<ProjectResponse> getProjectById (@PathVariable Long projectId) {
         ProjectResponse response = projectService.getProjectById(projectId);
 
         return ResponseEntity.ok(response);
