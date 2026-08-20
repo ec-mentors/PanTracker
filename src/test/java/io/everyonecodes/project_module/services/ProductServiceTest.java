@@ -169,6 +169,44 @@ class ProductServiceTest {
     }
 
     @Test
+    void getProductById_Success() {
+        Long productId = 10L;
+        Category category = Category.builder().id(5L).name("Mascara").build();
+        User user = User.builder().id(1L).username("David").build();
+
+        Product product = Product.builder()
+                .id(productId)
+                .user(user)
+                .category(category)
+                .name("Ultra Black Mascara")
+                .brand("NARS")
+                .isFinished(false)
+                .build();
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+        when(usageLogRepository.countByProductId(productId)).thenReturn(14);
+
+        ProductResponse response = productService.getProductById(productId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(productId);
+        assertThat(response.getName()).isEqualTo("Ultra Black Mascara");
+        assertThat(response.getCategoryName()).isEqualTo("Mascara");
+        assertThat(response.getTotalUses()).isEqualTo(14);
+    }
+
+    @Test
+    void getProductById_ThrowsException_WhenProductNotFound() {
+        Long productId = 99L;
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.getProductById(productId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Product with ID 99 not found");
+    }
+
+    @Test
     void updateProductSuccessNoCategoryChange() {
         Long productId = 10L;
         Long categoryId = 5L;

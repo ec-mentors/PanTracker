@@ -82,6 +82,15 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    // get single product by id
+    @Transactional(readOnly = true)
+    public ProductResponse getProductById(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + productId + " not found."));
+
+        return mapToResponse(product);
+    }
+
     // update product details
     @Transactional
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
