@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS users CASCADE;
 -- think about if I want to leave out the user by now because security is really difficult.
 -- users will be created for now, but there will not be any authorisation yet(no password), anyone can enter if you know the username
 CREATE TABLE users (
-   id SERIAL PRIMARY KEY,
+   id BIGSERIAL PRIMARY KEY,
    username VARCHAR(50) UNIQUE NOT NULL,
    email VARCHAR(100) UNIQUE NOT NULL,
 -- password_hash VARCHAR(255) NOT NULL,
@@ -16,12 +16,12 @@ CREATE TABLE users (
 );
 
 CREATE TABLE categories (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE products (
-      id SERIAL PRIMARY KEY,
+      id BIGSERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
       category_id INTEGER NOT NULL,
       name VARCHAR(100) NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE products (
 );
 
 CREATE TABLE projects (
-      id SERIAL PRIMARY KEY,
+      id BIGSERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
       name VARCHAR(100) NOT NULL,
       description TEXT,
@@ -83,7 +83,7 @@ CREATE TABLE project_products (
 );
 
 CREATE TABLE usage_logs (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL,
     project_id INTEGER,
     use_date DATE NOT NULL DEFAULT CURRENT_DATE,
