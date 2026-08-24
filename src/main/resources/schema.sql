@@ -22,8 +22,8 @@ CREATE TABLE categories (
 
 CREATE TABLE products (
       id BIGSERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL,
-      category_id INTEGER NOT NULL,
+      user_id BIGINT NOT NULL,
+      category_id BIGINT NOT NULL,
       name VARCHAR(100) NOT NULL,
       brand VARCHAR(100),
       purchase_date DATE,
@@ -50,7 +50,7 @@ CREATE TABLE products (
 
 CREATE TABLE projects (
       id BIGSERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL,
+      user_id BIGINT NOT NULL,
       name VARCHAR(100) NOT NULL,
       description TEXT,
       start_date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -63,8 +63,8 @@ CREATE TABLE projects (
 );
 
 CREATE TABLE project_products (
-      project_id INTEGER NOT NULL,
-      product_id INTEGER NOT NULL,
+      project_id BIGINT NOT NULL,
+      product_id BIGINT NOT NULL,
 
       goal_type VARCHAR(30) NOT NULL DEFAULT 'FINISH_COMPLETELY',
       target_uses INTEGER CHECK (target_uses > 0),
@@ -84,8 +84,8 @@ CREATE TABLE project_products (
 
 CREATE TABLE usage_logs (
     id BIGSERIAL PRIMARY KEY,
-    product_id INTEGER NOT NULL,
-    project_id INTEGER,
+    product_id BIGINT NOT NULL,
+    project_id BIGINT,
     use_date DATE NOT NULL DEFAULT CURRENT_DATE,
     weight_recorded NUMERIC(5,2),
     notes TEXT,
