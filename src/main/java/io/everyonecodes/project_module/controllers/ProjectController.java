@@ -17,7 +17,7 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
 
-    @PostMapping("/user/{userId}/projects")
+    @PostMapping("/users/{userId}/projects")
     public ResponseEntity<ProjectResponse> createProject (@PathVariable Long userId, @Valid @RequestBody ProjectRequest request) {
         ProjectResponse response = projectService.createProject(userId, request);
 

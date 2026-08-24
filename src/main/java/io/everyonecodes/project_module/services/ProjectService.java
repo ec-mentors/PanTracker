@@ -31,6 +31,7 @@ public class ProjectService {
 
         // map dto to entity
         Project project = Project.builder()
+                .user(user)
                 .name(request.getName())
                 .description(request.getDescription())
                 .endDate(request.getEndDate())
