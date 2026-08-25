@@ -23,8 +23,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<UserResponse> loginUser (@RequestParam String username) {
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> loginUser(@RequestParam String username) {
         UserResponse response = userService.loginUser(username);
 
         return ResponseEntity.ok(response);
