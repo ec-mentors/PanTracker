@@ -24,7 +24,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/user/{userId}/projects")
+    @GetMapping("/users/{userId}/projects")
     public ResponseEntity<List<ProjectResponse>> getProjectsByUser (@PathVariable Long userId) {
         List<ProjectResponse> responses = projectService.getProjectsByUser(userId);
 
