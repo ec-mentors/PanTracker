@@ -125,12 +125,22 @@ public class ViewController {
     }
 
     @GetMapping("/products/{productId}/detail/{userId}")
-    public String showProductDetail(@PathVariable Long productId, @PathVariable Long userId, Model model) {
+    public String showProductDetail(
+            @PathVariable Long productId,
+            @PathVariable Long userId,
+            @RequestParam(required = false) String returnUrl, // Capture return path
+            Model model) {
+
         model.addAttribute("userId", userId);
         model.addAttribute("product", productService.getProductById(productId));
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("history", usageLogService.getProductUsageHistory(productId));
         model.addAttribute("activeProjects", projectService.getProjectsByUser(userId));
+        model.addAttribute("currentProjects", projectProductService.getProjectsForProduct(productId));
+
+        // Safe Fallback: Default to collection view if returnUrl is missing
+        String fallbackUrl = "/users/" + userId + "/collection";
+        model.addAttribute("returnUrl", (returnUrl != null && !returnUrl.isEmpty()) ? returnUrl : fallbackUrl);
 
         model.addAttribute("logRequest", new UsageLogRequest());
         model.addAttribute("linkRequest", new ProjectProductLinkRequest());
@@ -138,25 +148,39 @@ public class ViewController {
     }
 
     @PostMapping("/products/{productId}/edit/{userId}")
-    public String editProduct(@PathVariable Long productId, @PathVariable Long userId, @ModelAttribute ProductRequest request) {
+    public String editProduct(
+            @PathVariable Long productId,
+            @PathVariable Long userId,
+            @RequestParam(required = false) String returnUrl, // Accept parameter
+            @ModelAttribute ProductRequest request) {
         productService.updateProduct(productId, request);
-        return "redirect:/products/" + productId + "/detail/" + userId;
+
+        // Append returnUrl to redirect
+        return "redirect:/products/" + productId + "/detail/" + userId + "?returnUrl=" + returnUrl;
     }
 
     @PostMapping("/products/{productId}/use/{userId}")
-    public String useProduct(@PathVariable Long productId, @PathVariable Long userId, @ModelAttribute UsageLogRequest request) {
+    public String useProduct(
+            @PathVariable Long productId,
+            @PathVariable Long userId,
+            @RequestParam(required = false) String returnUrl, // Accept parameter
+            @ModelAttribute UsageLogRequest request) {
         usageLogService.logUsage(productId, request);
-        return "redirect:/products/" + productId + "/detail/" + userId;
+
+        // Append returnUrl to redirect
+        return "redirect:/products/" + productId + "/detail/" + userId + "?returnUrl=" + returnUrl;
     }
 
     @PostMapping("/products/{productId}/link-project/{userId}")
     public String linkProjectFromProductPage(
             @PathVariable Long productId,
             @PathVariable Long userId,
-            @RequestParam Long projectId, // Captured from the dropdown selection
+            @RequestParam Long projectId,
+            @RequestParam(required = false) String returnUrl, // Accept parameter
             @ModelAttribute ProjectProductLinkRequest request) {
-
         projectProductService.addProductToProject(projectId, productId, request);
-        return "redirect:/products/" + productId + "/detail/" + userId;
+
+        // Append returnUrl to redirect
+        return "redirect:/products/" + productId + "/detail/" + userId + "?returnUrl=" + returnUrl;
     }
 }

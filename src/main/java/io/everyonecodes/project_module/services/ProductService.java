@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,13 +139,17 @@ public class ProductService {
     }
 
     private ProductResponse mapToResponse(Product product) {
-        int totalUses = usageLogRepository.countByProductId(product.getId());
+        long totalUses = usageLogRepository.countByProductId(product.getId());
+        LocalDate expirationDate = product.getOpeningDate()
+                .plusMonths(product.getPeriodAfterOpeningMonths());
+
+        boolean expired = LocalDate.now().isAfter(expirationDate);
 
         return ProductResponse.builder()
                 .id(product.getId())
-                .categoryName(product.getCategory().getName())
                 .name(product.getName())
                 .brand(product.getBrand())
+                .categoryName(product.getCategory().getName())
                 .purchaseDate(product.getPurchaseDate())
                 .openingDate(product.getOpeningDate())
                 .periodAfterOpeningMonths(product.getPeriodAfterOpeningMonths())
@@ -152,7 +157,9 @@ public class ProductService {
                 .currentWeightGrams(product.getCurrentWeightGrams())
                 .rating(product.getRating())
                 .isFinished(product.isFinished())
-                .totalUses(totalUses)
+                .totalUses((int) totalUses)
+                .expirationDate(expirationDate)
+                .expired(expired)
                 .build();
     }
 }

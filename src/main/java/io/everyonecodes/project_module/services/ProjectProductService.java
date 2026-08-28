@@ -78,6 +78,14 @@ public class ProjectProductService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<ProjectProductResponse> getProjectsForProduct(Long productId) {
+        return projectProductRepository.findByProductId(productId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private ProjectProductResponse mapToResponse(ProjectProduct junction) {
         Long productId = junction.getProduct().getId();
         Long projectId = junction.getProject().getId();
