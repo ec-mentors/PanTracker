@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><title>PanTracker - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-rose-50 flex items-center justify-center h-screen">
+<div class="bg-white p-8 rounded-xl shadow-md w-96 border border-rose-100">
+    <h1 class="text-3xl font-extrabold text-rose-600 text-center mb-2">💄 PanTracker</h1>
+    <p class="text-xs text-gray-400 text-center mb-6">Use what you have, beat the clutter.</p>
+
+    <div th:if="${param.registered}" class="mb-4 p-3 bg-green-50 text-green-700 text-xs rounded border border-green-200">
+        Registration successful! Please login below.
+    </div>
+    <div th:if="${error}" class="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded border border-red-200" th:text="${error}"></div>
+
+    <form th:action="@{/login}" method="POST" class="space-y-4">
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Username</label>
+            <!-- name="username" matches the @RequestParam "username" in Java -->
+            <input type="text"
+                   name="username"
+                   th:value="${username}"
+                   required
+                   class="w-full p-2.5 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-rose-500">
+        </div>
+        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-2.5 rounded font-bold transition">Login</button>
+    </form>
+    <p class="text-center text-xs text-gray-500 mt-6">Don't have an account? <a href="/register" class="text-rose-600 font-semibold hover:underline">Register here</a></p>
+</div>
+</body>
+</html>

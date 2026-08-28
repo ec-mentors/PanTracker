@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PanTracker - Product Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+<!-- Header Navbar -->
+<header class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center shadow-sm">
+    <a th:href="@{'/users/' + ${userId} + '/collection'}" class="text-rose-600 font-bold hover:underline">&larr; Back to Collection</a>
+    <h1 class="text-xl font-bold text-gray-800">Product Analytics & Management</h1>
+</header>
+
+<!-- Main Grid Container -->
+<main class="max-w-6xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- LEFT COLUMN: Product Metadata & Logs Timeline (2/3 Width) -->
+    <section class="lg:col-span-2 space-y-6">
+
+        <!-- Product Profile Card -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <!-- Category Badge -->
+                    <span class="text-[10px] font-extrabold text-rose-500 uppercase tracking-wider bg-rose-50 py-1 px-2.5 rounded-full border border-rose-100"
+                          th:text="${product.categoryName}">LIPSTICK</span>
+
+                    <h2 class="text-3xl font-extrabold text-gray-800 mt-2" th:text="${product.name}">Velvet Lip Glide</h2>
+                    <p class="text-gray-400 text-sm font-medium mt-0.5" th:text="${product.brand != null ? product.brand : 'No Brand'}">NARS</p>
+                </div>
+
+                <!-- Dynamic Star Rating Display (1-10) -->
+                <div th:if="${product.rating != null}" class="flex items-center space-x-1.5 bg-amber-50 text-amber-600 py-1.5 px-3.5 rounded-lg border border-amber-100 shadow-sm">
+                    <span class="text-lg">⭐</span>
+                    <span class="font-extrabold text-base"><span th:text="${product.rating}">8</span>/10</span>
+                </div>
+                <div th:if="${product.rating == null}" class="text-xs text-gray-400 italic bg-gray-50 py-1.5 px-3 rounded border border-gray-100">
+                    Not rated yet
+                </div>
+            </div>
+
+            <!-- Product Metric Cards (Uses double data type mappings) -->
+            <div class="grid grid-cols-3 gap-4 border-t border-gray-100 pt-6 text-center">
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Starting Weight</div>
+                    <div class="font-extrabold text-xl text-gray-700 mt-1"
+                         th:text="${product.startingWeightGrams != null ? product.startingWeightGrams + 'g' : 'N/A'}">15.00g</div>
+                </div>
+                <div class="p-4 bg-rose-50 rounded-lg border border-rose-100">
+                    <div class="text-[9px] font-bold text-rose-400 uppercase tracking-wide">Current Weight</div>
+                    <div class="font-extrabold text-xl text-rose-600 mt-1"
+                         th:text="${product.currentWeightGrams != null ? product.currentWeightGrams + 'g' : 'N/A'}">12.45g</div>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Total Applications</div>
+                    <div class="font-extrabold text-xl text-gray-700 mt-1" th:text="${product.totalUses}">14</div>
+                </div>
+            </div>
+
+            <!-- Lifespan Metadata -->
+            <div class="mt-6 flex justify-between text-xs text-gray-400 font-medium">
+                <span>Opened: <strong class="text-gray-600" th:text="${product.openingDate}">2026-01-15</strong></span>
+                <span>PAO Lifespan: <strong class="text-gray-600" th:text="${product.periodAfterOpeningMonths} + ' Months'">12 Months</strong></span>
+            </div>
+        </div>
+
+        <!-- Historical Usage Logs Timeline -->
+        <h3 class="text-xl font-bold mt-8 mb-4">Application History Timeline</h3>
+        <div class="space-y-3">
+            <div th:each="log : ${history}" class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex justify-between items-start">
+                <div class="space-y-1">
+                    <div class="text-xs text-gray-400 font-semibold" th:text="${log.useDate}">2026-08-25</div>
+                    <p class="text-sm text-gray-700 font-medium" th:text="${log.notes != null ? log.notes : 'Applied product.'}">Logged application.</p>
+
+                    <!-- Indicates if this specific log was associated with a challenge -->
+                    <span th:if="${log.projectName != null}"
+                          class="inline-block text-[9px] font-extrabold bg-rose-50 text-rose-600 py-0.5 px-2 rounded-full border border-rose-100 uppercase"
+                          th:text="'Project: ' + ${log.projectName}">Project: Summer Pan</span>
+                </div>
+                <span th:if="${log.weightRecorded != null}" class="text-xs bg-rose-50 text-rose-600 py-1.5 px-3 rounded-lg font-extrabold" th:text="${log.weightRecorded} + 'g'">12.45g</span>
+            </div>
+            <p th:if="${history.isEmpty()}" class="text-sm text-gray-400 italic">No usage logs found for this item yet. Use the sidebar to log your first application!</p>
+        </div>
+    </section>
+
+    <!-- RIGHT COLUMN: Action Forms Panel (1/3 Width) -->
+    <section class="space-y-6">
+
+        <!-- FORM 1: Apply Product (Create UsageLog) -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">Apply Product (Log Use)</h3>
+            <form th:action="@{'/products/' + ${product.id} + '/use/' + ${userId}}" th:object="${logRequest}" method="POST" class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">New Recorded Weight (Grams)</label>
+                    <input type="number" step="0.01" th:field="*{weightRecorded}" class="w-full p-2.5 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Notes / Progress Updates</label>
+                    <textarea th:field="*{notes}" rows="2" class="w-full p-2.5 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Link to Active Challenge (Optional)</label>
+                    <select th:field="*{projectId}" class="w-full p-2.5 border border-gray-200 rounded text-sm bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                        <option value="">-- Do not link project --</option>
+                        <option th:each="proj : ${activeProjects}" th:value="${proj.id}" th:text="${proj.name}">Summer Glow Challenge</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-2.5 rounded font-bold text-sm transition">Log Application</button>
+            </form>
+        </div>
+
+        <!-- FORM 2: Edit Product (Including 1-10 Rating & Manual Finished Toggle) -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">Edit Product Catalog Details</h3>
+            <form th:action="@{'/products/' + ${product.id} + '/edit/' + ${userId}}" th:object="${product}" method="POST" class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Category</label>
+                    <select name="categoryId" required class="w-full p-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat.id}"
+                                th:text="${cat.name}"
+                                th:selected="${cat.name == product.categoryName}">Category</option>
+                    </select>
+                </div>                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Product Name</label>
+                    <input type="text" name="name" th:value="${product.name}" required class="w-full p-2 border border-gray-200 rounded text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Brand</label>
+                    <input type="text" name="brand" th:value="${product.brand}" class="w-full p-2 border border-gray-200 rounded text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Starting Weight (g)</label>
+                    <input type="number" step="0.01" name="startingWeightGrams" th:value="${product.startingWeightGrams}" class="w-full p-2 border border-gray-200 rounded text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Opening Date</label>
+                        <input type="date" name="openingDate" th:value="${product.openingDate}" required class="w-full p-2 border border-gray-200 rounded text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">PAO (Months)</label>
+                        <input type="number" name="periodAfterOpeningMonths" th:value="${product.periodAfterOpeningMonths}" required min="0" class="w-full p-2 border border-gray-200 rounded text-sm">
+                    </div>
+                </div>
+
+                <!-- Rating Input (1-10) -->
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Rating (1 - 10)</label>
+                    <input type="number" name="rating" th:value="${product.rating}" min="1" max="10" placeholder="Not rated" class="w-full p-2 border border-gray-200 rounded text-sm">
+                </div>
+
+                <!-- Manual Finished Toggle -->
+                <div class="flex items-center space-x-2.5 pt-2">
+                    <input type="checkbox" name="isFinished" id="isFinishedCheckbox" th:checked="${product.finished}" class="rounded border-gray-300 text-rose-600 focus:ring-rose-500 h-4 w-4">
+                    <label for="isFinishedCheckbox" class="text-xs font-bold text-gray-500 uppercase cursor-pointer select-none">Mark Product Empty</label>
+                </div>
+
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-2.5 rounded font-bold text-xs transition">Update Catalog</button>
+            </form>
+        </div>
+
+        <!-- FORM 3: Link Product to a Project Challenge -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">Add Product to a Challenge</h3>
+            <form th:action="@{'/products/' + ${product.id} + '/link-project/' + ${userId}}" th:object="${linkRequest}" method="POST" class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Select Challenge</label>
+                    <select name="projectId" required class="w-full p-2.5 border border-gray-200 rounded text-sm bg-white focus:outline-none">
+                        <option th:each="proj : ${activeProjects}" th:value="${proj.id}" th:text="${proj.name}">Summer Glow Challenge</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Goal Type</label>
+                    <select th:field="*{goalType}" required class="w-full p-2.5 border border-gray-200 rounded text-sm bg-white focus:outline-none">
+                        <option value="FINISH_COMPLETELY">Finish Completely</option>
+                        <option value="USE_X_TIMES">Use X Times</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Target Uses (Optional)</label>
+                    <input type="number" th:field="*{targetUses}" min="1" class="w-full p-2.5 border border-gray-200 rounded text-sm focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-2.5 rounded font-bold text-xs transition">Associate to Project</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><title>PanTracker - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+<header class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-rose-600">💄 PanTracker</h1>
+    <div class="flex items-center space-x-6">
+        <a th:href="@{'/users/' + ${userId} + '/collection'}" class="text-sm font-semibold hover:text-rose-600">My Collection</a>
+        <a th:href="@{'/users/' + ${userId} + '/projects'}" class="text-sm font-semibold hover:text-rose-600">My Projects</a>
+        <a th:href="@{'/users/' + ${userId} + '/empties'}" class="text-sm font-semibold hover:text-rose-600">Empties</a>
+        <a href="/login" class="text-sm text-gray-400 hover:text-red-500 font-semibold">Logout</a>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto py-8 px-4">
+    <h2 class="text-3xl font-extrabold mb-8">Dashboard Overview</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Active Projects Panel -->
+        <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Active Projects</h3>
+                <a th:href="@{'/users/' + ${userId} + '/projects'}" class="text-rose-500 hover:underline text-sm font-semibold">See All &rarr;</a>
+            </div>
+            <div class="space-y-4">
+                <div th:each="project : ${projects}" class="p-4 bg-gray-50 rounded border border-gray-100 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-gray-800" th:text="${project.name}">Summer Challenge</h4>
+                        <p class="text-xs text-gray-400" th:text="${project.description}">Using makeup up...</p>
+                    </div>
+                    <span class="text-xs bg-rose-50 text-rose-600 py-1 px-2.5 rounded font-bold" th:text="${project.productCount} + ' Items'">0 Items</span>
+                </div>
+                <p th:if="${projects.isEmpty()}" class="text-sm text-gray-400 italic">No active projects yet.</p>
+            </div>
+        </section>
+
+        <!-- Active Collection Panel -->
+        <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Your Active Collection</h3>
+                <a th:href="@{'/users/' + ${userId} + '/collection'}" class="text-rose-500 hover:underline text-sm font-semibold">Manage Catalog &rarr;</a>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div th:each="product : ${products}" class="p-4 bg-gray-50 rounded border border-gray-100 flex flex-col justify-between h-28">
+                    <div>
+                        <span class="text-[9px] font-extrabold text-rose-500 uppercase tracking-wider" th:text="${product.categoryName}">LIPSTICK</span>
+                        <h4 class="font-bold text-xs text-gray-800 mt-1 truncate" th:text="${product.name}">Velvet Lip</h4>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] text-gray-500 font-semibold">
+                        <span>Uses: <strong th:text="${product.totalUses}">0</strong></span>
+                        <span th:text="${product.currentWeightGrams} + 'g'">12g</span>
+                    </div>
+                </div>
+                <p th:if="${products.isEmpty()}" class="text-sm text-gray-400 italic col-span-2">Your collection is empty.</p>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

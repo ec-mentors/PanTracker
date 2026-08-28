@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><title>PanTracker - Projects</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+<header class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center">
+    <a th:href="@{'/dashboard/' + ${userId}}" class="text-rose-600 font-bold hover:underline">&larr; Back to Dashboard</a>
+    <h1 class="text-xl font-bold text-gray-800">My Project Challenges</h1>
+</header>
+
+<main class="max-w-6xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Projects List -->
+    <section class="lg:col-span-2 space-y-4">
+        <h2 class="text-2xl font-bold mb-4">Active Challenges</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div th:each="project : ${projects}" class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-36">
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg" th:text="${project.name}">Summer Pan</h3>
+                    <p class="text-xs text-gray-400 truncate" th:text="${project.description}">Challenge description...</p>
+                    <div class="mt-2 text-xs text-rose-600 font-semibold" th:text="${project.productCount} + ' Items Linked'">0 Items</div>
+                </div>
+                <a th:href="@{'/projects/' + ${project.id} + '/detail/' + ${userId}}" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold py-1.5 px-3 rounded text-center transition">Project Area &rarr;</a>
+            </div>
+            <p th:if="${projects.isEmpty()}" class="text-sm text-gray-400 italic">No active projects found.</p>
+        </div>
+    </section>
+
+    <!-- Add Project Form -->
+    <section class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm h-fit">
+        <h3 class="text-xl font-bold mb-6">Create New Project</h3>
+        <form th:action="@{'/users/' + ${userId} + '/projects/add'}" th:object="${projectRequest}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Project Name</label>
+                <input type="text" th:field="*{name}" required class="w-full p-2.5 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Description</label>
+                <textarea th:field="*{description}" rows="3" class="w-full p-2.5 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></textarea>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">End Date</label>
+                <input type="date" th:field="*{endDate}" class="w-full p-2.5 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+            </div>
+            <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-2.5 rounded font-bold text-sm transition">Create Project</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

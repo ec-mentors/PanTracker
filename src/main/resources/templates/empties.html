@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><title>PanTracker - Empties</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+<header class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center">
+    <a th:href="@{'/dashboard/' + ${userId}}" class="text-rose-600 font-bold hover:underline">&larr; Back to Dashboard</a>
+    <h1 class="text-xl font-bold text-gray-800">My Empties (Finished)</h1>
+</header>
+
+<main class="max-w-6xl mx-auto py-8 px-4">
+    <div class="max-w-2xl mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-800 mb-2">Trash to Treasure</h2>
+        <p class="text-gray-400 text-sm">This is your dynamic trophy room of fully completed and rated beauty products. Be proud of the products you completely used up!</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div th:each="product : ${products}" class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-44">
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-[9px] font-extrabold text-green-600 bg-green-50 py-0.5 px-2 rounded border border-green-150 uppercase" th:text="${product.categoryName}">LIPSTICK</span>
+                    <span th:if="${product.rating != null}" class="text-xs text-amber-500 font-bold">⭐ <span th:text="${product.rating}">8</span>/10</span>
+                </div>
+                <h3 class="font-extrabold text-lg text-gray-800 truncate" th:text="${product.name}">Velvet Lip</h3>
+                <p class="text-xs text-gray-400" th:text="${product.brand}">NARS</p>
+            </div>
+
+            <div class="border-t border-gray-50 pt-4 flex justify-between items-center">
+                <span class="text-xs text-gray-500">Total Uses: <strong th:text="${product.totalUses}">14</strong></span>
+                <a th:href="@{'/products/' + ${product.id} + '/detail/' + ${userId}}" class="text-rose-500 hover:underline text-xs font-bold">Analytics &rarr;</a>
+            </div>
+        </div>
+        <p th:if="${products.isEmpty()}" class="text-sm text-gray-400 italic">No empties recorded yet. Keep panning!</p>
+    </div>
+</main>
+</body>
+</html>
