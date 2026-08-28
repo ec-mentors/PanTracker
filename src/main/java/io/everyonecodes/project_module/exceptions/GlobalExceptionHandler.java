@@ -28,4 +28,12 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    // Handle Illegal Arguments and returning http 400 Bad Request
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+    }
 }
