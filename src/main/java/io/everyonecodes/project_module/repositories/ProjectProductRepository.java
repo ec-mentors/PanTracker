@@ -13,4 +13,6 @@ public interface ProjectProductRepository extends JpaRepository<ProjectProduct, 
     List<ProjectProduct> findByProjectId(Long projectId);
 
     long countByProjectId(Long projectId);
+
+    List<ProjectProduct> findByProductId(Long productId);
 }

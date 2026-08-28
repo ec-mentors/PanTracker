@@ -5,9 +5,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
-<header class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center">
-    <a th:href="@{'/dashboard/' + ${userId}}" class="text-rose-600 font-bold hover:underline">&larr; Back to Dashboard</a>
-    <h1 class="text-xl font-bold text-gray-800">My Project Challenges</h1>
+<header class="bg-white border-b border-gray-200 py-4 px-8 grid grid-cols-3 items-center shadow-sm">
+    <!-- Column 1 (Left): Back to Dashboard + Brand Logo Home Link -->
+    <div class="flex justify-start items-center space-x-4">
+        <a th:href="@{'/dashboard/' + ${userId}}" class="text-gray-400 hover:text-rose-600 font-bold">&larr; Back</a>
+        <span class="text-gray-200">|</span>
+        <a th:href="@{'/dashboard/' + ${userId}}" class="text-rose-600 font-extrabold hover:underline">💄 PanTracker</a>
+    </div>
+
+    <!-- Column 2 (Center): Centered Title -->
+    <div class="flex justify-center text-center">
+        <h1 class="text-lg font-bold text-gray-800">My Project Challenges</h1>
+    </div>
+
+    <!-- Column 3 (Right): Navigation with Dashboard Link -->
+    <div class="flex justify-end items-center space-x-6">
+        <a th:href="@{'/dashboard/' + ${userId}}" class="text-sm font-semibold hover:text-rose-600">Dashboard</a>
+        <a th:href="@{'/users/' + ${userId} + '/collection'}" class="text-sm font-semibold hover:text-rose-600">My Collection</a>
+        <a th:href="@{'/users/' + ${userId} + '/projects'}" class="text-sm font-semibold hover:text-rose-600 text-rose-600 font-bold">My Projects</a>
+        <a th:href="@{'/users/' + ${userId} + '/empties'}" class="text-sm font-semibold hover:text-rose-600">Empties</a>
+        <a href="/login" class="text-sm text-gray-400 hover:text-red-500 font-semibold">Logout</a>
+    </div>
 </header>
 
 <main class="max-w-6xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">

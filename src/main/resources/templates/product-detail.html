@@ -8,9 +8,27 @@
 <body class="bg-gray-50 text-gray-800 font-sans">
 
 <!-- Header Navbar -->
-<header class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center shadow-sm">
-    <a th:href="@{'/users/' + ${userId} + '/collection'}" class="text-rose-600 font-bold hover:underline">&larr; Back to Collection</a>
-    <h1 class="text-xl font-bold text-gray-800">Product Analytics & Management</h1>
+<header class="bg-white border-b border-gray-200 py-4 px-8 grid grid-cols-3 items-center shadow-sm">
+    <!-- Column 1 (Left): Back Button + Brand Logo Home Link -->
+    <div class="flex justify-start items-center space-x-4">
+        <a th:href="${returnUrl}" class="text-gray-400 hover:text-rose-600 font-bold">&larr; Back</a>
+        <span class="text-gray-200">|</span>
+        <a th:href="@{'/dashboard/' + ${userId}}" class="text-rose-600 font-extrabold hover:underline">💄 PanTracker</a>
+    </div>
+
+    <!-- Column 2 (Center): Centered Title -->
+    <div class="flex justify-center text-center">
+        <h1 class="text-lg font-bold text-gray-800">Product Analytics</h1>
+    </div>
+
+    <!-- Column 3 (Right): Navigation with Dashboard Link -->
+    <div class="flex justify-end items-center space-x-6">
+        <a th:href="@{'/dashboard/' + ${userId}}" class="text-sm font-semibold hover:text-rose-600">Dashboard</a>
+        <a th:href="@{'/users/' + ${userId} + '/collection'}" class="text-sm font-semibold hover:text-rose-600">My Collection</a>
+        <a th:href="@{'/users/' + ${userId} + '/projects'}" class="text-sm font-semibold hover:text-rose-600">My Projects</a>
+        <a th:href="@{'/users/' + ${userId} + '/empties'}" class="text-sm font-semibold hover:text-rose-600">Empties</a>
+        <a href="/login" class="text-sm text-gray-400 hover:text-red-500 font-semibold">Logout</a>
+    </div>
 </header>
 
 <!-- Main Grid Container -->
@@ -60,9 +78,38 @@
             </div>
 
             <!-- Lifespan Metadata -->
-            <div class="mt-6 flex justify-between text-xs text-gray-400 font-medium">
+            <div class="mt-6 flex justify-between text-xs text-gray-400 font-medium items-center border-t border-gray-50 pt-4">
                 <span>Opened: <strong class="text-gray-600" th:text="${product.openingDate}">2026-01-15</strong></span>
+
+                <!-- Expiration Date + Status Badge -->
+                <div class="flex items-center space-x-2 bg-gray-50 py-1 px-3 rounded-full border border-gray-100">
+                    <span>Expires: <strong class="text-gray-700" th:text="${product.expirationDate}">2027-01-15</strong></span>
+                    <!-- If expired is true (serialized as "expired" from the DTO) -->
+                    <span th:if="${product.expired}" class="bg-red-50 text-red-600 font-extrabold px-2 py-0.5 rounded-full border border-red-100 uppercase text-[9px]">Expired</span>
+                    <!-- If expired is false -->
+                    <span th:if="${!product.expired}" class="bg-green-50 text-green-600 font-extrabold px-2 py-0.5 rounded-full border border-green-100 uppercase text-[9px]">Safe</span>
+                </div>
+
                 <span>PAO Lifespan: <strong class="text-gray-600" th:text="${product.periodAfterOpeningMonths} + ' Months'">12 Months</strong></span>
+                <div class="mt-6 border-t border-gray-150 pt-4">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-3">Active Challenges Participating In</div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Loop over each project the product is currently linked to -->
+                        <div th:each="cp : ${currentProjects}"
+                             class="bg-rose-50 text-rose-600 border border-rose-100 px-3.5 py-2 rounded-xl text-xs flex items-center space-x-2 font-medium">
+                            <span class="font-extrabold" th:text="${cp.projectName}">Summer Pan Challenge</span>
+                            <span class="text-rose-200">|</span>
+                            <span>Progress: <strong th:text="${cp.currentUses}">0</strong>/<span th:text="${cp.targetUses != null ? cp.targetUses : 'Finish'}">10</span> uses</span>
+                        </div>
+
+                        <!-- Rendered if the product is not linked to any projects -->
+                        <div th:if="${currentProjects.isEmpty()}"
+                             class="text-xs text-gray-400 italic bg-gray-50 border border-gray-100 py-2 px-4 rounded-lg">
+                            This product is not currently participating in any active challenges.
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -92,6 +139,7 @@
         <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
             <h3 class="text-lg font-bold mb-4 text-gray-800">Apply Product (Log Use)</h3>
             <form th:action="@{'/products/' + ${product.id} + '/use/' + ${userId}}" th:object="${logRequest}" method="POST" class="space-y-3">
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">New Recorded Weight (Grams)</label>
                     <input type="number" step="0.01" th:field="*{weightRecorded}" class="w-full p-2.5 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
@@ -115,6 +163,7 @@
         <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
             <h3 class="text-lg font-bold mb-4 text-gray-800">Edit Product Catalog Details</h3>
             <form th:action="@{'/products/' + ${product.id} + '/edit/' + ${userId}}" th:object="${product}" method="POST" class="space-y-3">
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Category</label>
                     <select name="categoryId" required class="w-full p-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
@@ -165,9 +214,12 @@
         <!-- FORM 3: Link Product to a Project Challenge -->
         <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
             <h3 class="text-lg font-bold mb-4 text-gray-800">Add Product to a Challenge</h3>
+            <!-- Action points to the helper endpoint we added, passing current productId and userId -->
             <form th:action="@{'/products/' + ${product.id} + '/link-project/' + ${userId}}" th:object="${linkRequest}" method="POST" class="space-y-3">
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Select Challenge</label>
+                    <!-- name="projectId" matches the @RequestParam in our controller -->
                     <select name="projectId" required class="w-full p-2.5 border border-gray-200 rounded text-sm bg-white focus:outline-none">
                         <option th:each="proj : ${activeProjects}" th:value="${proj.id}" th:text="${proj.name}">Summer Glow Challenge</option>
                     </select>

@@ -5,9 +5,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
-<header class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center">
-    <a th:href="@{'/users/' + ${userId} + '/projects'}" class="text-rose-600 font-bold hover:underline">&larr; Back to Projects</a>
-    <h1 class="text-xl font-bold text-gray-800">Challenge Dashboard</h1>
+<header class="bg-white border-b border-gray-200 py-4 px-8 grid grid-cols-3 items-center shadow-sm">
+    <!-- Column 1 (Left): Back to Projects + Brand Logo Home Link -->
+    <div class="flex justify-start items-center space-x-4">
+        <a th:href="@{'/users/' + ${userId} + '/projects'}" class="text-gray-400 hover:text-rose-600 font-bold">&larr; Back</a>
+        <span class="text-gray-200">|</span>
+        <a th:href="@{'/dashboard/' + ${userId}}" class="text-rose-600 font-extrabold hover:underline">💄 PanTracker</a>
+    </div>
+
+    <!-- Column 2 (Center): Centered Title -->
+    <div class="flex justify-center text-center">
+        <h1 class="text-lg font-bold text-gray-800">Project Challenge Dashboard</h1>
+    </div>
+
+    <!-- Column 3 (Right): Navigation with Dashboard Link -->
+    <div class="flex justify-end items-center space-x-6">
+        <a th:href="@{'/dashboard/' + ${userId}}" class="text-sm font-semibold hover:text-rose-600">Dashboard</a>
+        <a th:href="@{'/users/' + ${userId} + '/collection'}" class="text-sm font-semibold hover:text-rose-600">My Collection</a>
+        <a th:href="@{'/users/' + ${userId} + '/projects'}" class="text-sm font-semibold hover:text-rose-600">My Projects</a>
+        <a th:href="@{'/users/' + ${userId} + '/empties'}" class="text-sm font-semibold hover:text-rose-600">Empties</a>
+        <a href="/login" class="text-sm text-gray-400 hover:text-red-500 font-semibold">Logout</a>
+    </div>
 </header>
 
 <main class="max-w-6xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -21,21 +39,33 @@
 
         <h3 class="text-xl font-bold mt-8 mb-4">Participating Products</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div th:each="jp : ${projectProducts}" class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-44">
+            <div th:each="jp : ${projectProducts}"
+                 class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-52">
+
                 <div>
                     <div class="flex justify-between items-start">
                         <span class="text-[9px] font-extrabold text-rose-500 uppercase" th:text="${jp.categoryName}">LIPSTICK</span>
                         <span th:if="${jp.finished}" class="bg-green-50 text-green-700 text-[10px] font-bold py-0.5 px-2 rounded border border-green-200">Finished</span>
                     </div>
+                    <!-- Product Brand & Name -->
                     <h4 class="font-bold text-gray-800 mt-1" th:text="${jp.productName}">Velvet Lip</h4>
                     <p class="text-xs text-gray-400" th:text="${jp.productBrand}">NARS</p>
                 </div>
 
-                <div class="mt-4 bg-gray-50 p-2.5 rounded border border-gray-100">
+                <!-- Goal Details -->
+                <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
                     <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Goal: <span th:text="${jp.goalType}">USE_X_TIMES</span></div>
-                    <div class="text-xs text-gray-700">
+                    <div class="text-xs text-gray-700 font-medium">
                         Progress: <strong th:text="${jp.currentUses}">0</strong> / <span th:text="${jp.targetUses != null ? jp.targetUses : 'Finish'}">10</span> uses
                     </div>
+                </div>
+
+                <!-- ADDED: Direct Navigation Action Row -->
+                <div class="border-t border-gray-100 pt-2 flex justify-end">
+                    <a th:href="@{'/products/' + ${jp.productId} + '/detail/' + ${userId}(returnUrl='/projects/' + ${project.id} + '/detail/' + ${userId})}"
+                       class="text-[10px] font-bold text-rose-500 hover:text-rose-700 hover:underline">View Details &rarr;</a>
+                </div>
+            </div>
                 </div>
             </div>
             <p th:if="${projectProducts.isEmpty()}" class="text-sm text-gray-400 italic">No products participating in this project yet.</p>
