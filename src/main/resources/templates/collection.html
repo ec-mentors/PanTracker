@@ -32,22 +32,27 @@
     <!-- Products Grid List -->
     <section class="lg:col-span-2 space-y-4">
         <h2 class="text-2xl font-bold mb-4">Inventory Products</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div th:each="product : ${products}" class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-36">
-                <div>
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-extrabold text-rose-500 uppercase" th:text="${product.categoryName}">LIPSTICK</span>
-                        <span th:if="${product.rating != null}" class="text-xs text-amber-500 font-bold">⭐ <span th:text="${product.rating}">8</span>/10</span>
+        <div class="space-y-3">
+            <!-- Die gesamte Zeile ist ein anklickbarer Link -->
+            <a th:each="product : ${products}"
+               th:href="@{'/products/' + ${product.id} + '/detail/' + ${userId} + '?returnUrl=/users/' + ${userId} + '/collection'}"
+               class="block bg-white p-4 rounded-lg border border-gray-200 hover:border-poppy hover:shadow-sm transition flex justify-between items-center cursor-pointer">
+
+                <div class="flex items-center space-x-4">
+                        <span class="text-[9px] font-extrabold text-poppy uppercase bg-petal-light py-1 px-2.5 rounded-full border border-petal/30"
+                              th:text="${product.categoryName}">LIPSTICK</span>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-sm" th:text="${product.name}">Velvet Lip</h3>
+                        <p class="text-[10px] text-gray-400 font-medium" th:text="${product.brand != null ? product.brand : 'No Brand'}">NARS</p>
                     </div>
-                    <h3 class="font-bold text-gray-800 mt-1" th:text="${product.name}">Velvet Lip</h3>
-                    <p class="text-xs text-gray-400" th:text="${product.brand}">NARS</p>
                 </div>
-                <div class="flex justify-between items-center mt-4">
-                    <span class="text-xs font-semibold text-gray-500">Uses: <strong th:text="${product.totalUses}">0</strong></span>
-                    <a th:href="@{'/products/' + ${product.id} + '/detail/' + ${userId}(returnUrl='/users/' + ${userId} + '/collection')}"
-                       class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold py-1.5 px-3 rounded transition">Product Details &rarr;</a>
+
+                <div class="flex items-center space-x-6 text-xs font-semibold text-gray-500">
+                    <span th:if="${product.rating != null}" class="text-amber-500">⭐ <span th:text="${product.rating}">8</span>/10</span>
+                    <span>Uses: <strong th:text="${product.totalUses}" class="text-gray-700">0</strong></span>
+                    <span th:text="${product.currentWeightGrams} + 'g'" class="text-gray-700">12g</span>
                 </div>
-            </div>
+            </a>
             <p th:if="${products.isEmpty()}" class="text-sm text-gray-400 italic">No products in collection yet.</p>
         </div>
     </section>
@@ -66,9 +71,20 @@
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Category</label>
-                <select th:field="*{categoryId}" required class="w-full p-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                <select th:field="*{categoryId}" class="w-full p-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-poppy focus:outline-none bg-white">
+                    <option value="">-- Or type new category below --</option>
                     <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Lipstick</option>
                 </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Or Create New Category</label>
+                <input type="text" th:field="*{newCategoryName}" placeholder="e.g., Bronzer"
+                       class="w-full p-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-poppy focus:outline-none bg-white">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Purchase Date (Optional)</label>
+                <input type="date" th:field="*{purchaseDate}"
+                       class="w-full p-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-poppy focus:outline-none bg-white">
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>

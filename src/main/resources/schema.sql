@@ -34,6 +34,7 @@ CREATE TABLE products (
       current_weight_grams NUMERIC(5,2),
 
       rating INTEGER CHECK (rating BETWEEN 1 AND 10),
+      notes TEXT,
       is_finished BOOLEAN NOT NULL DEFAULT FALSE,
 -- optional: image_url VARCHAR(255),
 

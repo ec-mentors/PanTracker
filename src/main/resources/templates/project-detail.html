@@ -38,37 +38,26 @@
         </div>
 
         <h3 class="text-xl font-bold mt-8 mb-4">Participating Products</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div th:each="jp : ${projectProducts}"
-                 class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-52">
+        <div class="space-y-3">
+            <a th:each="jp : ${projectProducts}"
+               th:href="@{'/products/' + ${jp.productId} + '/detail/' + ${userId} + '?returnUrl=/projects/' + ${project.id} + '/detail/' + ${userId}}"
+               class="block bg-white p-4 rounded-lg border border-gray-200 hover:border-poppy hover:shadow-sm transition flex justify-between items-center cursor-pointer">
 
-                <div>
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-extrabold text-rose-500 uppercase" th:text="${jp.categoryName}">LIPSTICK</span>
-                        <span th:if="${jp.finished}" class="bg-green-50 text-green-700 text-[10px] font-bold py-0.5 px-2 rounded border border-green-200">Finished</span>
-                    </div>
-                    <!-- Product Brand & Name -->
-                    <h4 class="font-bold text-gray-800 mt-1" th:text="${jp.productName}">Velvet Lip</h4>
-                    <p class="text-xs text-gray-400" th:text="${jp.productBrand}">NARS</p>
-                </div>
-
-                <!-- Goal Details -->
-                <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Goal: <span th:text="${jp.goalType}">USE_X_TIMES</span></div>
-                    <div class="text-xs text-gray-700 font-medium">
-                        Progress: <strong th:text="${jp.currentUses}">0</strong> / <span th:text="${jp.targetUses != null ? jp.targetUses : 'Finish'}">10</span> uses
+                <div class="flex items-center space-x-4">
+                        <span class="text-[9px] font-extrabold text-poppy uppercase bg-petal-light py-1 px-2.5 rounded-full border border-petal/30"
+                              th:text="${jp.categoryName}">LIPSTICK</span>
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm" th:text="${jp.productName}">Velvet Lip</h4>
+                        <span th:if="${jp.finished}" class="bg-green-50 text-green-700 text-[8px] font-bold py-0.5 px-1.5 rounded border border-green-200 uppercase ml-2">Finished</span>
                     </div>
                 </div>
 
-                <!-- ADDED: Direct Navigation Action Row -->
-                <div class="border-t border-gray-100 pt-2 flex justify-end">
-                    <a th:href="@{'/products/' + ${jp.productId} + '/detail/' + ${userId}(returnUrl='/projects/' + ${project.id} + '/detail/' + ${userId})}"
-                       class="text-[10px] font-bold text-rose-500 hover:text-rose-700 hover:underline">View Details &rarr;</a>
+                <div class="flex items-center space-x-6 text-xs text-gray-500 font-semibold">
+                    <span>Goal: <span class="font-bold text-gray-700" th:text="${jp.goalType}">USE_X_TIMES</span></span>
+                    <span>Progress: <strong th:text="${jp.currentUses}" class="text-gray-700">0</strong> / <span th:text="${jp.targetUses != null ? jp.targetUses : 'Finish'}">10</span> uses</span>
                 </div>
-            </div>
-                </div>
-            </div>
-            <p th:if="${projectProducts.isEmpty()}" class="text-sm text-gray-400 italic">No products participating in this project yet.</p>
+            </a>
+            <p th:if="${projectProducts.isEmpty()}" class="text-sm text-gray-400 italic">No products participating yet.</p>
         </div>
     </section>
 

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,8 @@ public class ProjectProductService {
 
         return projectProductRepository.findByProjectId(projectId)
                 .stream()
+                .sorted(Comparator.comparing((ProjectProduct jp) -> jp.getProduct().getCategory().getName())
+                        .thenComparing(jp -> jp.getProduct().getOpeningDate()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

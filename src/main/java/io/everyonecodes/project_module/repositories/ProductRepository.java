@@ -10,4 +10,5 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // Find active (isFinished = false) or empty (isFinished = true)
     List<Product> findByUserIdAndIsFinished(Long userId, boolean isFinished);
+    List<Product> findByUserIdAndIsFinishedOrderByCategoryNameAscOpeningDateAsc(Long userId, boolean isFinished);
 }

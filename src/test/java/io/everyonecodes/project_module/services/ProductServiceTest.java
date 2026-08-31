@@ -126,6 +126,8 @@ class ProductServiceTest {
         when(userRepository.existsById(userId)).thenReturn(true);
         when(productRepository.findByUserIdAndIsFinished(userId, false))
                 .thenReturn(java.util.List.of(activeProduct));
+        when(productRepository.findByUserIdAndIsFinishedOrderByCategoryNameAscOpeningDateAsc(userId, false))
+                .thenReturn(java.util.List.of(activeProduct));
         when(usageLogRepository.countByProductId(anyLong())).thenReturn(0);
 
         List<ProductResponse> responseList = productService.getActiveCollection(userId);
@@ -155,6 +157,8 @@ class ProductServiceTest {
 
         when(userRepository.existsById(userId)).thenReturn(true);
         when(productRepository.findByUserIdAndIsFinished(userId, true))
+                .thenReturn(java.util.List.of(finishedProduct));
+        when(productRepository.findByUserIdAndIsFinishedOrderByCategoryNameAscOpeningDateAsc(userId, true))
                 .thenReturn(java.util.List.of(finishedProduct));
         when(usageLogRepository.countByProductId(anyLong())).thenReturn(0);
 

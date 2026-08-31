@@ -3,7 +3,6 @@ package io.everyonecodes.project_module.controllers;
 import io.everyonecodes.project_module.dtos.requests.*;
 import io.everyonecodes.project_module.dtos.responses.UserResponse;
 import io.everyonecodes.project_module.services.*;
-import io.everyonecodes.project_module.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +17,7 @@ public class ViewController {
     private final ProjectService projectService;
     private final ProjectProductService projectProductService;
     private final UsageLogService usageLogService;
-    private final CategoryRepository categoryRepository; // Seeded categories for forms
+    private final CategoryService categoryService;
 
     @GetMapping("/login")
     public String showLoginPage() {
@@ -69,7 +68,7 @@ public class ViewController {
     public String showCollection(@PathVariable Long userId, Model model) {
         model.addAttribute("userId", userId);
         model.addAttribute("products", productService.getActiveCollection(userId));
-        model.addAttribute("categories", categoryRepository.findAll());
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("productRequest", new ProductRequest());
         return "collection";
     }
@@ -133,7 +132,7 @@ public class ViewController {
 
         model.addAttribute("userId", userId);
         model.addAttribute("product", productService.getProductById(productId));
-        model.addAttribute("categories", categoryRepository.findAll());
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("history", usageLogService.getProductUsageHistory(productId));
         model.addAttribute("activeProjects", projectService.getProjectsByUser(userId));
         model.addAttribute("currentProjects", projectProductService.getProjectsForProduct(productId));
@@ -182,5 +181,14 @@ public class ViewController {
 
         // Append returnUrl to redirect
         return "redirect:/products/" + productId + "/detail/" + userId + "?returnUrl=" + returnUrl;
+    }
+
+    @PostMapping("/users/{userId}/categories/add")
+    public String addCategory(@PathVariable Long userId, @RequestParam String categoryName) {
+        try {
+            categoryService.createCategory(new CategoryRequest(categoryName));
+        } catch (IllegalArgumentException e) {
+        }
+        return "redirect:/users/" + userId + "/collection";
     }
 }

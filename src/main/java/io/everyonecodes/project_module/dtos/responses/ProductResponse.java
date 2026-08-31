@@ -29,6 +29,7 @@ public class ProductResponse {
     private Integer rating;
     private boolean isFinished;
     private Integer totalUses;
+    private String notes;
 
     //tracking lifespan
     private LocalDate expirationDate;

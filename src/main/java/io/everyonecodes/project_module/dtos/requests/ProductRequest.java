@@ -17,8 +17,9 @@ public class ProductRequest {
 
     private String brand;
 
-    @NotNull(message = "Category ID is required")
     private Long categoryId;
+
+    private String newCategoryName;
 
     @NotNull(message = "Opening date is required")
     private LocalDate openingDate;
@@ -34,5 +35,6 @@ public class ProductRequest {
     @Max(value = 10, message = "Rating cannot exceed 10")
     private Integer rating;
 
+    private String notes;
     private Boolean isFinished;
 }

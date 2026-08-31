@@ -31,14 +31,11 @@ public class ProductService {
     //creating a new product
     @Transactional
     public ProductResponse createProduct(Long userId, ProductRequest request) {
-        // check if User and Category exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found."));
 
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category with ID " + request.getCategoryId() + " not found."));
+        Category category = getOrCreateCategory(request);
 
-        // map DTO to Product model
         Product product = Product.builder()
                 .user(user)
                 .category(category)
@@ -49,11 +46,9 @@ public class ProductService {
                 .periodAfterOpeningMonths(request.getPeriodAfterOpeningMonths())
                 .startingWeightGrams(request.getStartingWeightGrams())
                 .currentWeightGrams(request.getStartingWeightGrams())
-                .rating(request.getRating())
                 .isFinished(false)
                 .build();
 
-        // save and return as response
         Product savedProduct = productRepository.save(product);
         return mapToResponse(savedProduct);
     }
@@ -65,7 +60,7 @@ public class ProductService {
             throw new ResourceNotFoundException("User with ID " + userId + " not found.");
         }
 
-        return productRepository.findByUserIdAndIsFinished(userId, false)
+        return productRepository.findByUserIdAndIsFinishedOrderByCategoryNameAscOpeningDateAsc(userId, false)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -78,7 +73,7 @@ public class ProductService {
             throw new ResourceNotFoundException("User with ID " + userId + " not found.");
         }
 
-        return productRepository.findByUserIdAndIsFinished(userId, true)
+        return productRepository.findByUserIdAndIsFinishedOrderByCategoryNameAscOpeningDateAsc(userId, true)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -96,18 +91,12 @@ public class ProductService {
     // update product details
     @Transactional
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
-        // fetch product
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + productId + " not found."));
 
-        // fetch category if changed in the update form
-        if (!product.getCategory().getId().equals(request.getCategoryId())) {
-            Category category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category with ID " + request.getCategoryId() + " not found."));
-            product.setCategory(category);
-        }
+        Category category = getOrCreateCategory(request);
+        product.setCategory(category);
 
-        // update mutable catalog fields
         product.setName(request.getName());
         product.setBrand(request.getBrand());
         product.setPurchaseDate(request.getPurchaseDate());
@@ -118,13 +107,11 @@ public class ProductService {
 
         if (request.getIsFinished() != null) {
             product.setFinished(request.getIsFinished());
-
             if (request.getIsFinished()) {
                 product.setCurrentWeightGrams(BigDecimal.ZERO);
             }
         }
 
-        // save and return response DTO
         Product updatedProduct = productRepository.save(product);
         return mapToResponse(updatedProduct);
     }
@@ -136,6 +123,22 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + productId + " not found."));
 
         productRepository.delete(product);
+    }
+
+    private Category getOrCreateCategory(ProductRequest request) {
+        if (request.getNewCategoryName() != null && !request.getNewCategoryName().trim().isEmpty()) {
+            String cleanName = request.getNewCategoryName().trim();
+
+            return categoryRepository.findByName(cleanName)
+                    .orElseGet(() -> categoryRepository.save(Category.builder().name(cleanName).build()));
+        }
+        else if (request.getCategoryId() != null) {
+            return categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category with ID " + request.getCategoryId() + " not found."));
+        }
+        else {
+            throw new IllegalArgumentException("You must either select an existing category or enter a new category name.");
+        }
     }
 
     private ProductResponse mapToResponse(Product product) {
@@ -160,6 +163,7 @@ public class ProductService {
                 .totalUses((int) totalUses)
                 .expirationDate(expirationDate)
                 .expired(expired)
+                .notes(product.getNotes())
                 .build();
     }
 }

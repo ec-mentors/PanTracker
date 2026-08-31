@@ -53,6 +53,9 @@ public class Product {
     @Max(value = 10, message = "Rating cannot exceed 10")
     private Integer rating;
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
     @Column(name = "is_finished", nullable = false)
     @Builder.Default
     private boolean isFinished = false;
